@@ -2,6 +2,10 @@
 
 A custom Home Assistant integration that brings your [Nextcloud Cookbook](https://apps.nextcloud.com/apps/cookbook) directly into your Home Assistant dashboard – no separate browser tab needed.
 
+<img src="Main.png" width="400"/>
+<img src="Rezept.png" width="400"/>
+<img src="add.png" width="400"/>
+
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-blue)
 ![HACS](https://img.shields.io/badge/HACS-Custom%20Repository-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
