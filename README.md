@@ -86,11 +86,11 @@ After setup, a **Cookbook** entry appears in the Home Assistant sidebar (left me
 - Click any recipe card to open it
 
 ### Recipe Detail
-- Adjust **servings** with the `−` / `+` buttons – ingredient quantities update automatically
-- **Check off** ingredients and steps by tapping them
-- Tap the 🛒 **cart icon** next to any ingredient to add it to your HA shopping list
-- Tap **▶** to start a timer for a step (if the recipe has timing data)
-- Use the **↺** buttons to reset checkboxes
+- Adjust servings with the − / + buttons – ingredient quantities update automatically
+- Check off ingredients and steps by tapping them
+- Tap the cart icon next to any ingredient to add it to your HA shopping list
+- Tap play to start a timer for a step (if the recipe has timing data)
+- Use the Return icon buttons to reset checkboxes
 
 ### Edit / Create Recipes
 - Open a recipe and tap **Edit** in the top bar to edit it directly
