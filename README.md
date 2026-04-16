@@ -10,17 +10,17 @@ A custom Home Assistant integration that brings your [Nextcloud Cookbook](https:
 
 ## Features
 
-- 📖 Browse all your Nextcloud Cookbook recipes from within Home Assistant
-- 🔍 Search and filter by category
-- ⚖️ Scale ingredient quantities by adjusting servings
-- ✅ Check off ingredients and preparation steps while cooking
-- ⏱️ Built-in timers for preparation steps
-- 🛒 Add ingredients directly to your HA shopping list (Todo entity)
-- ✏️ Edit existing recipes without leaving Home Assistant
-- ➕ Create new recipes manually or import from a URL
-- 🖼️ Local image cache for fast loading
-- 🎨 Automatically uses your Home Assistant theme colors
-- 🌍 Supports English and German (auto-detected from Home Assistant language settings)
+- Browse all your Nextcloud Cookbook recipes from within Home Assistant
+- Search and filter by category
+- Scale ingredient quantities by adjusting servings
+- Check off ingredients and preparation steps while cooking
+- Built-in timers for preparation steps
+- Add ingredients directly to your HA shopping list (Todo entity)
+- Edit existing recipes without leaving Home Assistant
+- Create new recipes manually or import from a URL
+- Local image cache for fast loading
+- Automatically uses your Home Assistant theme colors
+- Supports English and German (auto-detected from Home Assistant language settings)
 
 ---
 
@@ -115,13 +115,13 @@ After setup, a **Cookbook** entry appears in the Home Assistant sidebar (left me
 ## Changelog
 
 ### v1.1.0
-- 🌍 Auto language detection (English / German) based on Home Assistant or browser settings
-- 🗑️ Delete recipe button in editor
-- 📋 Category dropdown in editor (alphabetically sorted)
-- 🖼️ Image URL field with preview in editor
-- 🐛 Fixed: PUT/POST now use correct JSON format for Nextcloud Cookbook API
-- 🐛 Fixed: Import endpoint corrected (`/import` instead of `/recipes/url`)
-- 🐛 Fixed: Shopping list works via server-side proxy (no token issues)
+- Auto language detection (English / German) based on Home Assistant or browser settings
+- Delete recipe button in editor
+- Category dropdown in editor (alphabetically sorted)
+- Image URL field with preview in editor
+- Fixed: PUT/POST now use correct JSON format for Nextcloud Cookbook API
+- Fixed: Import endpoint corrected (`/import` instead of `/recipes/url`)
+- Fixed: Shopping list works via server-side proxy (no token issues)
 
 ### v1.0.0
 - Initial release
