@@ -1,0 +1,12 @@
+{
+  "domain": "nc_cookbook",
+  "name": "Nextcloud Cookbook",
+  "version": "1.1.0",
+  "documentation": "https://github.com/doctorspreter/homeassistant_nextcloud_cookbook",
+  "issue_tracker": "https://github.com/doctorspreter/homeassistant_nextcloud_cookbook/issues",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": ["@doctorspreter"],
+  "config_flow": true,
+  "iot_class": "local_polling"
+}

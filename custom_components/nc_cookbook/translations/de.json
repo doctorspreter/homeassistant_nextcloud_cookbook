@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Nextcloud Cookbook einrichten",
+        "description": "Erstelle ein App-Passwort unter: Einstellungen → Sicherheit → App-Passwörter",
+        "data": {
+          "url": "Nextcloud URL",
+          "username": "Benutzername",
+          "password": "App-Passwort",
+          "todo_entity": "Einkaufslisten-Entität"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen – URL prüfen",
+      "invalid_auth": "Ungültige Anmeldedaten",
+      "unknown": "Unbekannter Fehler"
+    },
+    "abort": {
+      "already_configured": "Kochbuch ist bereits eingerichtet"
+    }
+  }
+}
