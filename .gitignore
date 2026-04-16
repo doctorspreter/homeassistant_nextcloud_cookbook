@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+custom_components/nc_cookbook/panel/config.json
+custom_components/nc_cookbook/image_cache/
