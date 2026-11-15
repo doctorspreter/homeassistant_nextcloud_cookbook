@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import patch
 
 from custom_components.nc_cookbook.backend import BackendError, LocalBackend, NoRecipeImage
-from custom_components.nc_cookbook.config_flow import NcCookbookConfigFlow, NcCookbookOptionsFlow
+from custom_components.nc_cookbook.config_flow import NcCookbookConfigFlow, NcCookbookOptionsFlow, mode_schema
 from custom_components.nc_cookbook.const import settings
 from custom_components.nc_cookbook.importer import normalize, parse_recipe, validate_url
 from custom_components.nc_cookbook.storage import RecipeStore
@@ -173,6 +173,9 @@ class BackendTests(unittest.IsolatedAsyncioTestCase):
 
 
 class FlowTests(unittest.IsolatedAsyncioTestCase):
+    async def test_optional_shopping_list_has_no_invalid_empty_default(self):
+        self.assertEqual(mode_schema({})({"mode": "local"}), {"mode": "local"})
+
     def options(self, data=None, options=None):
         entry = SimpleNamespace(entry_id="existing", data=data or {"url": "https://cloud.example", "username": "cook", "password": "secret"}, options=options or {})
         class TestOptions(NcCookbookOptionsFlow):

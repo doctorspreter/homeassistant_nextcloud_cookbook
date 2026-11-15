@@ -19,7 +19,7 @@ def mode_schema(values):
         vol.Required(CONF_MODE, default=values.get(CONF_MODE, LOCAL)): selector.SelectSelector(
             selector.SelectSelectorConfig(options=[LOCAL, NEXTCLOUD], translation_key="mode")
         ),
-        vol.Optional(CONF_TODO_ENTITY, default=values.get(CONF_TODO_ENTITY, "")):
+        vol.Optional(CONF_TODO_ENTITY, description={"suggested_value": values.get(CONF_TODO_ENTITY)}):
             selector.EntitySelector(selector.EntitySelectorConfig(domain="todo")),
     })
 
@@ -122,7 +122,7 @@ class NcCookbookOptionsFlow(ConnectionFlow, config_entries.OptionsFlow):
     async def async_step_init(self, user_input=None):
         current = settings(self.config_entry)
         if user_input is not None:
-            self._pending = {**current, **user_input}
+            self._pending = {**current, **user_input, CONF_TODO_ENTITY: user_input.get(CONF_TODO_ENTITY) or ""}
             self._storage_id = current.get("storage_id", self.config_entry.entry_id)
             if user_input[CONF_MODE] == NEXTCLOUD:
                 return await self.async_step_nextcloud()
