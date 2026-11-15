@@ -2,23 +2,84 @@
   "config": {
     "step": {
       "user": {
-        "title": "Set up Nextcloud Cookbook",
-        "description": "Create an app password under: Settings → Security → App passwords",
+        "title": "Cookbook",
+        "description": "Choose where recipes are stored. Local recipes survive integration updates.",
+        "data": {
+          "mode": "Storage",
+          "todo_entity": "Shopping list"
+        }
+      },
+      "nextcloud": {
+        "title": "Nextcloud",
+        "description": "Enter an app password. Leave blank to keep the saved password.",
         "data": {
           "url": "Nextcloud URL",
           "username": "Username",
-          "password": "App Password",
-          "todo_entity": "Shopping List Entity"
+          "password": "App password"
+        }
+      },
+      "transfer": {
+        "title": "Copy recipes?",
+        "description": "Copy all Nextcloud recipes and images once? Nextcloud remains unchanged. Existing local recipes are preserved and previously copied recipes are skipped. Without copying, the existing local collection opens (empty on first use). There is no automatic synchronization. A failed transfer keeps the previous mode active.",
+        "data": {
+          "transfer": "Copy all recipes and images"
         }
       }
     },
     "error": {
-      "cannot_connect": "Failed to connect – please check the URL",
+      "cannot_connect": "Connection failed. Check the URL and certificate.",
       "invalid_auth": "Invalid credentials",
-      "unknown": "Unexpected error"
+      "transfer_failed": "Transfer failed. Mode was not changed. Check connectivity and recipe images, then retry."
     },
     "abort": {
       "already_configured": "Cookbook is already configured"
+    },
+    "progress": {
+      "transferring": "Copying recipes and images …"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Cookbook",
+        "description": "Choose where recipes are stored. Local recipes survive integration updates.",
+        "data": {
+          "mode": "Storage",
+          "todo_entity": "Shopping list"
+        }
+      },
+      "nextcloud": {
+        "title": "Nextcloud",
+        "description": "Enter an app password. Leave blank to keep the saved password.",
+        "data": {
+          "url": "Nextcloud URL",
+          "username": "Username",
+          "password": "App password"
+        }
+      },
+      "transfer": {
+        "title": "Copy recipes?",
+        "description": "Copy all Nextcloud recipes and images once? Nextcloud remains unchanged. Existing local recipes are preserved and previously copied recipes are skipped. Without copying, the existing local collection opens (empty on first use). There is no automatic synchronization. A failed transfer keeps the previous mode active.",
+        "data": {
+          "transfer": "Copy all recipes and images"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Connection failed. Check the URL and certificate.",
+      "invalid_auth": "Invalid credentials",
+      "transfer_failed": "Transfer failed. Mode was not changed. Check connectivity and recipe images, then retry."
+    },
+    "progress": {
+      "transferring": "Copying recipes and images …"
+    }
+  },
+  "selector": {
+    "mode": {
+      "options": {
+        "local": "Local (Home Assistant)",
+        "nextcloud": "Nextcloud"
+      }
     }
   }
 }

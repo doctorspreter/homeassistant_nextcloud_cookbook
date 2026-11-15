@@ -2,23 +2,84 @@
   "config": {
     "step": {
       "user": {
-        "title": "Nextcloud Cookbook einrichten",
-        "description": "Erstelle ein App-Passwort unter: Einstellungen → Sicherheit → App-Passwörter",
+        "title": "Cookbook",
+        "description": "Speicherort wählen. Lokale Rezepte bleiben auch bei Updates erhalten.",
+        "data": {
+          "mode": "Speicherort",
+          "todo_entity": "Einkaufsliste"
+        }
+      },
+      "nextcloud": {
+        "title": "Nextcloud",
+        "description": "App-Passwort angeben. Leer lassen behält das gespeicherte Passwort.",
         "data": {
           "url": "Nextcloud URL",
           "username": "Benutzername",
-          "password": "App-Passwort",
-          "todo_entity": "Einkaufslisten-Entität"
+          "password": "App-Passwort"
+        }
+      },
+      "transfer": {
+        "title": "Rezepte übernehmen?",
+        "description": "Alle Nextcloud-Rezepte einschließlich Bildern einmalig kopieren? Nextcloud bleibt unverändert. Vorhandene lokale Rezepte werden erhalten, bereits übernommene nicht erneut kopiert. Ohne Übernahme wird die vorhandene lokale Sammlung geöffnet (bei erster Nutzung leer). Es gibt keine automatische Synchronisierung. Bei einem Fehler bleibt der bisherige Modus aktiv.",
+        "data": {
+          "transfer": "Alle Rezepte und Bilder übernehmen"
         }
       }
     },
     "error": {
-      "cannot_connect": "Verbindung fehlgeschlagen – URL prüfen",
-      "invalid_auth": "Ungültige Anmeldedaten",
-      "unknown": "Unbekannter Fehler"
+      "cannot_connect": "Verbindung fehlgeschlagen. URL und Zertifikat prüfen.",
+      "invalid_auth": "Anmeldung fehlgeschlagen",
+      "transfer_failed": "Übernahme fehlgeschlagen. Der Modus wurde nicht geändert. Verbindung und Rezeptbilder prüfen und erneut versuchen."
     },
     "abort": {
-      "already_configured": "Kochbuch ist bereits eingerichtet"
+      "already_configured": "Cookbook ist bereits eingerichtet"
+    },
+    "progress": {
+      "transferring": "Rezepte und Bilder werden kopiert …"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Cookbook",
+        "description": "Speicherort wählen. Lokale Rezepte bleiben auch bei Updates erhalten.",
+        "data": {
+          "mode": "Speicherort",
+          "todo_entity": "Einkaufsliste"
+        }
+      },
+      "nextcloud": {
+        "title": "Nextcloud",
+        "description": "App-Passwort angeben. Leer lassen behält das gespeicherte Passwort.",
+        "data": {
+          "url": "Nextcloud URL",
+          "username": "Benutzername",
+          "password": "App-Passwort"
+        }
+      },
+      "transfer": {
+        "title": "Rezepte übernehmen?",
+        "description": "Alle Nextcloud-Rezepte einschließlich Bildern einmalig kopieren? Nextcloud bleibt unverändert. Vorhandene lokale Rezepte werden erhalten, bereits übernommene nicht erneut kopiert. Ohne Übernahme wird die vorhandene lokale Sammlung geöffnet (bei erster Nutzung leer). Es gibt keine automatische Synchronisierung. Bei einem Fehler bleibt der bisherige Modus aktiv.",
+        "data": {
+          "transfer": "Alle Rezepte und Bilder übernehmen"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen. URL und Zertifikat prüfen.",
+      "invalid_auth": "Anmeldung fehlgeschlagen",
+      "transfer_failed": "Übernahme fehlgeschlagen. Der Modus wurde nicht geändert. Verbindung und Rezeptbilder prüfen und erneut versuchen."
+    },
+    "progress": {
+      "transferring": "Rezepte und Bilder werden kopiert …"
+    }
+  },
+  "selector": {
+    "mode": {
+      "options": {
+        "local": "Lokal (Home Assistant)",
+        "nextcloud": "Nextcloud"
+      }
     }
   }
 }

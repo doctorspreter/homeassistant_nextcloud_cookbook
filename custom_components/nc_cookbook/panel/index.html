@@ -15,7 +15,7 @@
     --border:rgba(255,255,255,0.08);--shadow:0 4px 24px rgba(0,0,0,0.4);--radius:12px;
     --err:#f87171;
   }
-  html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--paper-font-body1_-_font-family,Roboto,sans-serif);font-size:14px;}
+  html,body{height:100%;background:var(--backdrop,var(--bg));color:var(--text);font-family:var(--paper-font-body1_-_font-family,Roboto,sans-serif);font-size:14px;}
   ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg-card2);border-radius:3px}
 
   .top-bar{display:none;position:sticky;top:0;z-index:100;background:var(--bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 16px;align-items:center;gap:10px;height:52px;flex-shrink:0;}
@@ -305,8 +305,8 @@ const I18N = {
     remove:"Remove", ing_placeholder:"e.g. 200 g flour", step_placeholder:"Preparation step…",
     keywords_placeholder:"Vegan, Quick, Summer",
     import_recipe:"Import recipe", import_from_url:"Import recipe from URL",
-    import_desc:"Paste the URL of a recipe page. Nextcloud Cookbook will extract ingredients and steps automatically.",
-    recipe_url:"Recipe URL", importing:"Importing…", import_reading:"Nextcloud is reading the recipe…",
+    import_desc:"Paste the URL of a recipe page. Cookbook extracts ingredients and steps automatically.",
+    recipe_url:"Recipe URL", importing:"Importing…", import_reading:"Reading the recipe…",
     create_manual:"Create new recipe manually", create_manual_desc:"Or start with a blank recipe and fill in everything yourself.",
     create_empty:"Create empty recipe",
     loading_recipes:"Loading recipes…", loading:"Loading…", loading_recipe:"Loading recipe…",
@@ -333,8 +333,8 @@ const I18N = {
     remove:"Entfernen", ing_placeholder:"z.B. 200 g Mehl", step_placeholder:"Zubereitungsschritt…",
     keywords_placeholder:"Vegan, Schnell, Sommer",
     import_recipe:"Rezept importieren", import_from_url:"Rezept von URL importieren",
-    import_desc:"Füge die URL einer Rezeptseite ein. Nextcloud Cookbook liest die Zutaten und Schritte automatisch aus.",
-    recipe_url:"Rezept-URL", importing:"Importiere…", import_reading:"Nextcloud liest das Rezept aus…",
+    import_desc:"Füge die URL einer Rezeptseite ein. Cookbook liest die Zutaten und Schritte automatisch aus.",
+    recipe_url:"Rezept-URL", importing:"Importiere…", import_reading:"Das Rezept wird ausgelesen…",
     create_manual:"Neues Rezept manuell erstellen", create_manual_desc:"Oder erstelle ein leeres Rezept und fülle alle Felder selbst aus.",
     create_empty:"Leeres Rezept erstellen",
     loading_recipes:"Rezepte werden geladen…", loading:"Lade…", loading_recipe:"Rezept wird geladen…",
@@ -379,9 +379,20 @@ function applyI18n(){
 
 /* ════════════════════════════════════════════════════════ API ═══════*/
 const api = p => `/api/nc_cookbook/${p}`;
-async function proxyFetch(path, options={}){ return fetch(api(path), options); }
+function ha(){
+  const hass = window.parent.document.querySelector('home-assistant')?.hass;
+  if(!hass) throw new Error('Open Cookbook inside Home Assistant');
+  return hass;
+}
+async function proxyFetch(path, options={}){ return ha().fetchWithAuth(api(path), options); }
+async function setRecipeImage(img, id){
+  try{
+    const signed = await ha().callWS({type:'auth/sign_path', path:api(`recipes/${encodeURIComponent(id)}/image`), expires:300});
+    if(img.isConnected) { img.src = signed.path; img.style.display='block'; }
+  }catch{ img.style.display='none'; }
+}
 async function proxyWrite(path, method, data){
-  return fetch(api(path), {
+  return proxyFetch(path, {
     method,
     headers: {'Content-Type': 'text/plain;charset=UTF-8'},
     body: JSON.stringify(data)
@@ -401,7 +412,7 @@ const fmtTime=s=>{const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
 const minToIso=min=>{if(!min||min<=0)return'';const h=Math.floor(min/60),m=min%60;return h&&m?`PT${h}H${m}M`:h?`PT${h}H`:`PT${m}M`;};
 const isoToMin=iso=>{if(!iso)return'';const m=iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);if(!m)return'';return String((parseInt(m[1]||0)*60)+parseInt(m[2]||0));};
 const $=id=>document.getElementById(id);
-const imgUrl=id=>`/api/nc_cookbook/recipes/${id}/image`;
+
 const cartIcon=()=>'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
 const escHtml=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
@@ -414,6 +425,8 @@ function applyHaTheme(){
     const ha=window.parent.document.querySelector('home-assistant');if(!ha)return;
     const s=window.parent.getComputedStyle(ha);const g=v=>s.getPropertyValue(v).trim();
     [['--primary-background-color','--bg'],['--card-background-color','--bg-card'],['--primary-color','--accent'],['--primary-text-color','--text'],['--secondary-text-color','--text-soft'],['--divider-color','--border']].forEach(([src,dst])=>{const v=g(src);if(v)document.documentElement.style.setProperty(dst,v);});
+    const bd=g('--glass-backdrop');
+    if(bd)document.documentElement.style.setProperty('--backdrop',bd);else document.documentElement.style.removeProperty('--backdrop');
     const acc=g('--primary-color');
     if(acc){try{const r=parseInt(acc.slice(1,3),16),gg=parseInt(acc.slice(3,5),16),b=parseInt(acc.slice(5,7),16);document.documentElement.style.setProperty('--accent-dim',`rgba(${r},${gg},${b},0.15)`);}catch{}}
   }catch{}
@@ -423,7 +436,7 @@ function applyHaTheme(){
 async function addToHaShopping(text,btn){
   try{
     const entity = window._nc_todo_entity || 'todo.shopping_list';
-    const res = await fetch('/api/nc_cookbook/__shopping__',{
+    const res = await proxyFetch('__shopping__',{
       method:'POST',
       headers:{'Content-Type':'text/plain;charset=UTF-8'},
       body:JSON.stringify({item:text, entity_id:entity})
@@ -522,9 +535,9 @@ function renderCards(recipes,q){
     const cat=Array.isArray(r.recipeCategory)?r.recipeCategory[0]:r.recipeCategory;
     const total=parseDur(r.totalTime||r.cookTime);
     const card=document.createElement('div');card.className='card';
-    card.innerHTML=`<div class="card-img-wrap"><div class="card-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/></svg></div><img src="${imgUrl(id)}" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/></div><div class="card-body">${cat?`<div class="card-cat">${escHtml(cat)}</div>`:''}<div class="card-name">${escHtml(r.name||t('unknown'))}</div><div class="card-meta">${total?`<span class="meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${total}</span>`:''}${r.recipeYield?`<span class="meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> ${escHtml(r.recipeYield)}</span>`:''}</div></div>`;
+    card.innerHTML=`<div class="card-img-wrap"><div class="card-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/></svg></div><img data-recipe-image="true" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/></div><div class="card-body">${cat?`<div class="card-cat">${escHtml(cat)}</div>`:''}<div class="card-name">${escHtml(r.name||t('unknown'))}</div><div class="card-meta">${total?`<span class="meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${total}</span>`:''}${r.recipeYield?`<span class="meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> ${escHtml(r.recipeYield)}</span>`:''}</div></div>`;
     card.addEventListener('click',()=>openRecipe(id,r.name));
-    $('recipe-grid').appendChild(card);
+    $('recipe-grid').appendChild(card); setRecipeImage(card.querySelector('img'),id);
   });
 }
 
@@ -540,7 +553,7 @@ async function openRecipe(id,name){
     const res=await proxyFetch(`recipes/${id}`);
     if(!res.ok)throw new Error(`HTTP ${res.status}`);
     currentRecipeData=await res.json();setStatus('',false);const r=currentRecipeData;
-    const img=$('detail-img');img.src=imgUrl(id);img.style.display='block';img.onerror=()=>img.style.display='none';
+    const img=$('detail-img');setRecipeImage(img,id);img.style.display='block';img.onerror=()=>img.style.display='none';
     const cats=Array.isArray(r.recipeCategory)?r.recipeCategory:(r.recipeCategory?[r.recipeCategory]:[]);
     $('detail-cats').innerHTML=cats.map(c=>`<span class="detail-cat">${escHtml(c)}</span>`).join('');
     $('detail-title').textContent=r.name||'';
@@ -595,7 +608,7 @@ function openEditor(recipe,isNew=false){
   $('edit-image').value = recipe.image || '';
   const preview = $('edit-image-preview');
   if(!isNew && rid){
-    preview.src = imgUrl(rid) + '?t=' + Date.now();
+    setRecipeImage(preview,rid);
     preview.style.display = 'block';
     preview.onerror = () => { preview.style.display = 'none'; };
   } else {
@@ -638,8 +651,8 @@ $('btn-delete').addEventListener('click', async () => {
   if(!id) return;
   if(!confirm(t('confirm_delete'))) return;
   try{
-    const res = await fetch(api(`recipes/${id}`), { method: 'DELETE' });
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const res = await proxyFetch(`recipes/${id}`, { method: 'DELETE' });
+    if(!res.ok){ const error=await res.json().catch(()=>({})); throw new Error(error.error || `HTTP ${res.status}`); }
     showToast(t('deleted'),'ok');
     await loadRecipes();
     showView('list');
@@ -676,7 +689,7 @@ $('btn-save').addEventListener('click', async () => {
     } else {
       res = await proxyWrite('recipes', 'POST', jsonPayload);
     }
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    if(!res.ok){ const error=await res.json().catch(()=>({})); throw new Error(error.error || `HTTP ${res.status}`); }
     const saved = await res.json();
     showToast(t('saved'),'ok');
     await loadRecipes();
@@ -703,7 +716,7 @@ $('btn-import').addEventListener('click', async () => {
   try{
     // Correct endpoint is /import (not /recipes/url)
     const res = await proxyWrite('import', 'POST', {url});
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    if(!res.ok){ const error=await res.json().catch(()=>({})); throw new Error(error.error || `HTTP ${res.status}`); }
     const data = await res.json();
     showToast(t('imported'),'ok');
     await loadRecipes();
@@ -741,13 +754,14 @@ function setStatus(html,isErr){const s=$('status-msg');s.innerHTML=html;s.style.
 
 /* ════════════════════════════════════════════════════════ STARTUP ═══*/
 window.addEventListener('load', async () => {
-  // 1. Load config.json (todo_entity + nc_url)
+  // 1. Read the active backend and shopping list through the authenticated API
   try{
-    const r = await fetch('/nc_cookbook_panel/config.json?t='+Date.now());
+    const r = await proxyFetch('__config__');
     if(r.ok){
       const d = await r.json();
-      window._nc_todo_entity = d.todo_entity || 'todo.shopping_list';
-      if(d.nc_url) window._nc_url = d.nc_url;
+      window._nc_todo_entity = d.todo_entity || '';
+      window._cookbook_mode = d.mode;
+
     }
   }catch(e){ console.error('config load:', e); }
 

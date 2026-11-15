@@ -1,168 +1,92 @@
-# Nextcloud Cookbook – Home Assistant Integration
+# Cookbook for Home Assistant
 
-A custom Home Assistant integration that brings your [Nextcloud Cookbook](https://apps.nextcloud.com/apps/cookbook) directly into your Home Assistant dashboard – no separate browser tab needed.
+A cookbook inside Home Assistant with a choice of **Local** or **Nextcloud** storage.
+Browse, search and categorize recipes, scale servings, use cooking timers, send ingredients
+to your HA shopping list, edit recipes and import them from recipe websites.
+English and German are supported.
 
-<img src="Main.png" width="400"/>
-<img src="Rezept.png" width="400"/>
-<img src="add.png" width="400"/>
+## Install with GitHub / HACS
 
-![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-blue)
-![HACS](https://img.shields.io/badge/HACS-Custom%20Repository-orange)
-![License](https://img.shields.io/badge/License-MIT-green)
+Requires Home Assistant 2025.1 or newer. Tested with Home Assistant 2026.10.4.
 
----
+1. In HACS, open **Custom repositories**.
+2. Add `https://github.com/doctorspreter/homeassistant_nextcloud_cookbook`, category **Integration**.
+3. Download **Cookbook** and restart Home Assistant.
+4. Open **Settings → Devices & services → Add integration → Cookbook**.
+5. Choose **Local (Home Assistant)** or **Nextcloud**, and optionally your shopping list.
 
-## Features
+Local mode needs no Nextcloud server, account, PHP service or additional container.
+Nextcloud mode requires the Nextcloud Cookbook app and an app password.
 
-- Browse all your Nextcloud Cookbook recipes from within Home Assistant
-- Search and filter by category
-- Scale ingredient quantities by adjusting servings
-- Check off ingredients and preparation steps while cooking
-- Built-in timers for preparation steps
-- Add ingredients directly to your HA shopping list (Todo entity)
-- Edit existing recipes without leaving Home Assistant
-- Create new recipes manually or import from a URL
-- Local image cache for fast loading
-- Automatically uses your Home Assistant theme colors
-- Supports English and German (auto-detected from Home Assistant language settings)
+Manual installation: copy `custom_components/nc_cookbook` from a GitHub release into
+`/config/custom_components/`, then restart Home Assistant. Forgejo is the development
+source; installation and updates use GitHub.
 
----
+## Switch storage
 
-## Requirements
+Open **Settings → Devices & services → Cookbook → Configure**.
+Existing installations keep using Nextcloud until you change the storage mode.
 
-- Home Assistant 2024.1 or newer
-- [Nextcloud Cookbook app](https://apps.nextcloud.com/apps/cookbook) installed on your Nextcloud instance
-- A Nextcloud **App Password** (not your main password)
+When switching from Nextcloud to Local, a separate question offers to copy **all recipes
+and images**. A progress screen stays open during the copy. Nextcloud originals are never
+changed. The local collection is committed only after the complete copy succeeds; a failed
+copy leaves the previous mode active and can be retried.
 
----
+Choosing not to copy opens the existing local collection (empty on first use). Switching
+back to Nextcloud opens the Nextcloud collection. There is **no automatic synchronization**
+in either direction. Repeated transfers skip recipes previously copied from the same
+Nextcloud account, preserving local edits and deletions; new remote recipes are added.
 
-## Installation
+## Local files and backups
 
-### Via HACS (recommended)
+Recipe JSON and images live in `/config/nc_cookbook/<storage-id>/`, outside the installed
+integration folder. Include this folder in your Home Assistant backups. HACS updates do
+not replace it. Removing a config entry does not delete recipe files.
 
-1. Open HACS in Home Assistant
-2. Go to **Integrations → Custom Repositories**
-3. Add `https://github.com/doctorspreter/homeassistant_nextcloud_cookbook` as a custom repository (type: Integration)
-4. Search for **Nextcloud Cookbook** and install it
-5. Restart Home Assistant
+Each stored recipe uses Schema.org Recipe fields. Additional fields (for example nutrition)
+are preserved when editing. Imported images are downloaded locally. Reading and editing
+stored recipes works without internet. Importing a website or a new image URL requires
+internet. Website imports support JSON-LD and HTML microdata; sites without readable
+Recipe markup, behind a login, or requiring JavaScript may not import. Only public HTTP(S)
+website/image URLs are accepted; private addresses and SVG files are rejected.
 
-### Manual Installation
+## Notes are a separate integration
 
-1. Download the latest release ZIP
-2. Extract the `nc_cookbook` folder into `/config/custom_components/`
-3. Restart Home Assistant
+Cookbook 2.0 contains **no Notes backend or Notes card**. Install
+[Nextcloud Notes](https://github.com/doctorspreter/homeassistant_nextcloud_notes)
+separately through HACS if you used the earlier locally bundled Notes feature. Add that
+integration before removing the old Cookbook configuration: Notes setup suggests the
+previous account and accepts a blank password to adopt the saved app password.
+The card type `custom:nc-notes-card` and resource `/nc_notes/nc-notes-card.js` stay the same.
 
----
+## Security and implementation
 
-## Setup
+Recipe and Notes APIs require a Home Assistant login. Nextcloud passwords remain on the
+server in HA configuration storage; protect your configuration and backups. The cookbook
+panel uses the current HA session and short-lived signed image URLs. Nextcloud HTTPS
+certificates are validated. A configured shopping list is used for ingredient additions.
 
-1. Go to **Settings → Devices & Services → Add Integration**
-2. Search for **Nextcloud Cookbook**
-3. Fill in the following fields:
+The local backend is an independent Python implementation of Schema.org Recipe storage
+and import, compatible with the data format used by Nextcloud Cookbook. No Nextcloud PHP
+source or AGPL components are included. This project retains its MIT license.
 
-| Field | Description | Example |
-|-------|-------------|---------|
-| **Nextcloud URL** | Full URL of your Nextcloud instance | `https://cloud.example.com` |
-| **Username** | Your Nextcloud username | `john` |
-| **App Password** | App password (not your main password) | `xxxx-xxxx-xxxx-xxxx` |
-| **Shopping List Entity** | HA Todo entity for the shopping list | `todo.shopping_list` |
+## Development and releases
 
-### Creating an App Password
+Work is maintained on Forgejo in `projekte/homeassistant_nextcloud_cookbook`.
+Publishing a Forgejo release triggers the existing Git-Spiegel service to publish the
+release commit and tag to the matching GitHub repository. HACS reads the GitHub release.
 
-1. Log in to Nextcloud
-2. Go to **Settings → Security → App passwords**
-3. Enter a name (e.g. "Home Assistant") and click **Generate new app password**
-4. Copy the generated password – you won't see it again
+Tests in a Home Assistant Python environment:
 
----
-
-## Usage
-
-After setup, a **Cookbook** entry appears in the Home Assistant sidebar (left menu).
-
-### Recipe List
-- Use the **search bar** to find recipes by name
-- Use the **category chips** to filter by category
-- Click any recipe card to open it
-
-### Recipe Detail
-- Adjust servings with the − / + buttons – ingredient quantities update automatically
-- Check off ingredients and steps by tapping them
-- Tap the cart icon next to any ingredient to add it to your HA shopping list
-- Tap play to start a timer for a step (if the recipe has timing data)
-- Use the Return icon buttons to reset checkboxes
-
-### Edit / Create Recipes
-- Open a recipe and tap **Edit** in the top bar to edit it directly
-- Tap the **＋ button** (bottom right) to create a new recipe or import one from a URL
-
----
-
-## Troubleshooting
-
-| Problem | Solution |
-|---------|----------|
-| Integration fails to set up | Check the Nextcloud URL (must include `https://`) and verify the app password |
-| Recipes don't load | Make sure the Nextcloud Cookbook app is installed and you have recipes |
-| Images are slow to load | Images are cached locally on first load – subsequent loads are instant |
-| Shopping list doesn't work | Verify the Todo entity name in the integration settings matches your actual HA entity |
-| Edit/Save gives error | Make sure your Nextcloud Cookbook app is up to date |
-
----
-
-## Known Issues
-
-- Recipe URL import depends on the target website supporting [Schema.org Recipe](https://schema.org/Recipe) markup
-
----
-
-## Changelog
-
-### v1.1.0
-- Auto language detection (English / German) based on Home Assistant or browser settings
-- Delete recipe button in editor
-- Category dropdown in editor (alphabetically sorted)
-- Image URL field with preview in editor
-- Fixed: PUT/POST now use correct JSON format for Nextcloud Cookbook API
-- Fixed: Import endpoint corrected (`/import` instead of `/recipes/url`)
-- Fixed: Shopping list works via server-side proxy (no token issues)
-
-### v1.0.0
-- Initial release
-
----
-
-## Architecture
-
-```
-Home Assistant
-└── nc_cookbook integration
-    ├── Proxy View (/api/nc_cookbook/*)
-    │   Forwards requests to Nextcloud Cookbook API
-    │   with authentication headers
-    ├── Static Panel (/nc_cookbook_panel/)
-    │   Serves the web UI (index.html)
-    └── Image Cache (image_cache/)
-        Local .jpg files for fast image loading
+```sh
+python -m unittest discover -s tests -v
 ```
 
----
+## 2.0.0
 
-## Privacy & Security
-
-- Your Nextcloud credentials are stored encrypted in Home Assistant's config store
-- The app password is only used server-side (never exposed to the browser)
-- Images are cached locally on the Home Assistant device
-- No data is sent to any third-party service
-
----
-
-## License
-
-MIT License – see [LICENSE](LICENSE) for details.
-
----
-
-## Contributing
-
-Pull requests are welcome! Please open an issue first to discuss what you would like to change.
+- Choose Local or Nextcloud during setup and in integration options.
+- Optional, transactional recipe and image migration with progress and retry.
+- Local recipe editing, categories, images and website import.
+- Preserve shopping list selection and existing Nextcloud configuration.
+- Separate Nextcloud Notes into its own HACS integration.
+- Authenticated recipe API and safe website downloads.
